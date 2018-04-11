@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Let's Play SF IPL 1.0</title>
+    <base href="/">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="icon" type="image/x-icon" href="favicon.ico"> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            //get the distinct team points
+            var temp1 = 0, temp2 = 0, profit1 = 0, profit2 = 0;
+
+            function distinct_team() {
+                //testing multi queries
+                var data_query21 = {
+                    query1: 'SELECT SUM(points) AS totalPoints1 FROM users where team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT SUM(points) AS totalPoints2 FROM users where team = "' + $("#select_match2").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/mult',
+                    data: JSON.stringify(data_query21),
+                    contentType: 'application/json',
+                    success: function (data_query21) {
+                        $("#total_points_t1").html(data_query21[0][0].totalPoints1);
+                        $("#total_points_t2").html(data_query21[1][0].totalPoints2);
+                        temp1 = data_query21[0][0].totalPoints1;
+                        temp2 = data_query21[1][0].totalPoints2;
+                        profit1 = parseFloat(temp2 / temp1).toFixed(2);
+                        profit2 = parseFloat(temp1 / temp2).toFixed(2);
+                        // if($("#team1_10_win").val())
+                        // if ($('#team1_10').html() != 0)
+                        $("#team1_10_win").html(profit1 * 10);
+                        // if ($('#team1_20').html() != 0)
+                        $("#team1_20_win").html(profit1 * 20);
+                        // if ($('#team1_30').html() != 0)
+                        $("#team1_30_win").html(profit1 * 30);
+                        // if ($('#team1_40').html() != 0)
+                        $("#team1_40_win").html(profit1 * 40);
+                        // if ($('#team1_50').html() != 0)
+                        $("#team1_50_win").html(profit1 * 50);
+                    }
+                });
+
+                var data_query3 = {
+                    query: 'SELECT count(points) as ten FROM users where points= "10" and team = "' + $("#select_match1").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/ten',
+                    data: JSON.stringify(data_query3),
+                    contentType: 'application/json',
+                    success: function (data_query3) {
+                        console.log("Data ssuccessfully posted for distinct2");
+                        console.log(data_query3);
+                        // $("#team1_10").html(data_query3[0].ten);
+                        $("#team1_10").html(data_query3[0].ten);
+                    }
+                });
+
+                var data_query4 = {
+                    query: 'SELECT count(points) as twenty FROM users where points= "20"and team = "' + $("#select_match1").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/20',
+                    data: JSON.stringify(data_query4),
+                    contentType: 'application/json',
+                    success: function (data_query4) {
+                        console.log("Data ssuccessfully posted for distinct2");
+                        console.log(data_query4);
+                        $("#team1_20").html(data_query4[0].twenty);
+                    }
+                });
+
+                var data_query5 = {
+                    query: 'SELECT count(points) as thirty FROM users where points= "30"and team = "' + $("#select_match1").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/30',
+                    data: JSON.stringify(data_query5),
+                    contentType: 'application/json',
+                    success: function (data_query5) {
+                        console.log("Data ssuccessfully posted for distinct2");
+                        console.log(data_query5);
+                        $("#team1_30").html(data_query5[0].thirty);
+                    }
+                });
+
+                var data_query6 = {
+                    query: 'SELECT count(points) as forty FROM users where points= "40"and team = "' + $("#select_match1").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/40',
+                    data: JSON.stringify(data_query6),
+                    contentType: 'application/json',
+                    success: function (data_query6) {
+                        console.log("Data ssuccessfully posted for distinct2");
+                        console.log(data_query6);
+                        $("#team1_40").html(data_query6[0].forty);
+                    }
+                });
+
+                var data_query7 = {
+                    query: 'SELECT count(points) as fifty FROM users where points= "50"and team = "' + $("#select_match1").val() + '";'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/50',
+                    data: JSON.stringify(data_query7),
+                    contentType: 'application/json',
+                    success: function (data_query7) {
+                        console.log("Data ssuccessfully posted for distinct2");
+                        console.log(data_query7);
+                        $("#team1_50").html(data_query7[0].fifty);
+                    }
+                });
+            }
+
+            function reload_table() {
+
+                var tds = document.getElementById('table_result').getElementsByTagName('td');
+                var ths = document.getElementById('table_result').getElementsByTagName('th');
+                var sum = 0, sum_team1 = 0, sum_team2 = 0, sum_team1_points = 0, sum_team2_points = 0;
+                //count total no of points people invested
+                for (var i = 0; i < tds.length; i++) {
+                    if (tds[i].className == 'count_me') {
+                        sum += isNaN(tds[i].innerHTML) ? 0 : parseInt(tds[i].innerHTML);
+                    }
+                    if (tds[i].className == 'count_team') {
+                        sum_team1 += (tds[i].innerHTML == $("#select_match1").val()) ? 0 : 1;
+                        sum_team2 += (tds[i].innerHTML == $("#select_match2").val()) ? 0 : 1;
+                        // sum_team1_points += (tds[i].innerHTML == $("#select_match1").val()) ? 0 : 1;
+                        // sum_team1_points += (tds[i].innerHTML == $("#select_match1").val()) ? 0 : 1;
+                    }
+                    if ((tds[i].innerHTML) == ($("#select_match1").val())) {
+                        sum_team1_points += isNaN(tds[i].innerHTML) ? 0 : parseInt(tds[i + 2].innerHTML);
+                    }
+                }
+                // console.log(tds[0].innerHTML + "  " + tds[1].innerHTML + "  " + tds[3].innerHTML);
+                $("#total_points").html(sum);
+                $("#team1_win").html($("#select_match1").val());
+                // $("#total_members_t1").html(sum_team1);
+                // $("#total_members_t2").html(sum_team2);
+
+                $("#ttl_pts_t1").html($("#select_match1").val() + "  " + sum_team2);
+                $("#ttl_pts_t2").html($("#select_match2").val() + "  " + sum_team1);
+            }
+
+            //bind the names
+            $.ajax
+                ({
+                    type: "GET",
+                    url: "user.json",
+                    datatype: 'JSON',
+                    success: function (data) {
+                        $("#select_name").append("<option value=\"" + "" + "\">" + "Select Name" + "</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#select_name").append("<option value=\"" + data[i].name + "\">" + data[i].name + "</option>");
+                        }
+                    }
+                });
+
+            //bind all the team names
+            $.ajax
+                ({
+                    type: "GET",
+                    url: "team.json",
+                    datatype: 'JSON',
+                    success: function (data) {
+                        $("#select_match1").append("<option value=\"" + "" + "\">" + "Select Team" + "</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#select_match1").append("<option value=\"" + data[i].team + "\">" + data[i].team + "</option>");
+                        }
+                        $("#select_match2").append("<option value=\"" + "" + "\">" + "Select Team" + "</option>");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#select_match2").append("<option value=\"" + data[i].team + "\">" + data[i].team + "</option>");
+                        }
+                    }
+                });
+
+            //bind the playing team names
+            $("#select_match1").change(function (e) {
+                $("#select_match2").change();
+            });
+            $("#select_match2").change(function (e) {
+                $("#select_team").empty();
+                if (($("#select_match2").val() != "") && ($("#select_match1").val() != "")) {
+                    $("#select_team").append("<option value=\"" + $("#select_match2").val() + "\">" + $("#select_match2").val() + "</option>");
+                    $("#select_team").append("<option value=\"" + $("#select_match1").val() + "\">" + $("#select_match1").val() + "</option>");
+                }
+                var tdy_match1 = $("#select_match1").val();
+                var tdy_match2 = $("#select_match2").val();
+                $("#table_result").empty();
+                $("#table_result").append('<thead><tr><th> NAME </th><th>' + tdy_match1 + '</th><th>' + tdy_match2 + '</th></tr></thead>');
+            });
+
+            //bind the points
+            $.ajax
+                ({
+                    type: "GET",
+                    url: "points.json",
+                    datatype: 'JSON',
+                    success: function (data) {
+                        $("#select_points").append("<option value=\"" + "" + "\">" + "Select Points" + "</option>");
+                        var sum = 0;
+                        for (var i = 0; i < data.length; i++) {
+                            $("#select_points").append("<option value=\"" + data[i].points + "\">" + data[i].points + "</option>");
+                        }
+                    }
+                });
+
+            $("#clear_db").click(function () {
+                var data_query = {
+                    query: "DELETE FROM users;"
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/delete_db',
+                    data: JSON.stringify(data_query),
+                    //datatype: 'json',
+                    contentType: 'application/json',
+                    success: function (data_query) {
+                        console.log(data_query + "data_query");
+                        alert("All Records Has Been Deleted!!");
+                    }
+                });
+            });
+            //on clicking submit btn
+            $("#submit").click(function () {
+                var name = $("#select_name").val();
+                var team_chose = $("#select_team").val();
+                var points = $("#select_points").val();
+
+                var tds = document.getElementById('table_result').getElementsByTagName('td');
+                var ths = document.getElementById('table_result').getElementsByTagName('th');
+                var sum = 0, sum_team1 = 0, sum_team2 = 0, sum_team1_points = 0, sum_team2_points = 0;
+                //count total no of points people invested
+                if (ths[1].innerHTML == $("#select_team").val())
+                    $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + 0 + '</td><td class = "count_me" >' + points + '</td></tr></tbody>');
+                else if (ths[2].innerHTML == $("#select_team").val()) {
+                    $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + points + '</td><td class = "count_me" >' + 0 + '</td></tr></tbody>');
+                }
+                var data = {
+                    name: name,
+                    team: team_chose,
+                    points: points
+                };
+                // saveText(JSON.stringify(json_data), "db.json");
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/users',
+                    data: JSON.stringify(data),
+                    //datatype: 'json',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        console.log("Data successfully posted");
+                    }
+                });
+                distinct_team();
+                reload_table();
+            });
+
+            $("#export").click(function (e) {
+
+                window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#table_data').html()));
+                e.preventDefault();
+                // window.open('data:application/vnd.ms-excel,' + $('#table_result').html());
+                // e.preventDefault();
+            });
+
+            // function saveText(text, filename) {
+            //     var a = document.createElement('a');
+            //     a.setAttribute('href', 'data:text/plain;charset=utf-u,' + encodeURIComponent(text));
+            //     a.setAttribute('download', filename);
+            //     a.click()
+            // }
+            var d = new Date();
+            var day = d.getDate();
+            var month = d.getMonth();
+            var year = d.getFullYear();
+            $("#todays_date").append(day + "/" + month + "/" + year);
+        });
+    </script>
+    <style>
+        .container {
+            background-color: rgb(209, 255, 253);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                <img alt="Brand" src="img.jpg" height="50" width="50">
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <label id="todays_date" class="form-control">Today is : </label>
+            </div>
+            <div class="col-sm-4" class="form-control">
+                <label>Select Today's match:</label>
+                <select id="select_match1" class="form-control"> </select>
+                vs
+                <select id="select_match2" class="form-control"> </select>
+            </div>
+            <div class="col-sm-4">
+                <label>Select Name</label>
+                <select id="select_name" class="form-control"> </select>
+            </div>
+            <div class="col-sm-4">
+                <label>Select Team</label>
+                <select id="select_team" class="form-control"> </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <label>Select Points</label>
+                <select id="select_points" class="form-control"> </select>
+                <button type="submit" id="submit" class="btn btn-success">Submit</button>
+            </div>
+            <div class="col-sm-4">
+                <label>Total Points on Team:
+                    <a id="total_points_t1"></a>
+                </label>
+            </div>
+            <div class="col-sm-4">
+                <label id="total_members_t1">Total members chose this Team:
+                    <a id="ttl_pts_t1"></a>
+                </label>
+            </div>
+            <div class="col-sm-4">
+                <label>Total Points on Team:
+                    <a id="total_points_t2"></a>
+                </label>
+            </div>
+            <div class="col-sm-4">
+                <label id="total_members_t2">Total members chose this Team:
+                    <a id="ttl_pts_t2"></a>
+                </label>
+            </div>
+            <div class="col-sm-4">
+                <button type="button" id="export" class="btn btn-info">Export as Excel</button>
+            </div>
+            <div class="col-sm-4">
+                <button type="submit" id="clear_db" class="btn btn-danger">Clear DB</button>
+            </div>
+            <div class="col-sm-4">
+                <label>Total Points People Applied so far :
+                    <a id="total_points"></a>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <label>
+                <h1>POINTS STATS</h1>
+            </label>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <label>If this team wins:
+                    <a id="team1_win"></a>
+                    <a id="team1_win_profit"></a>
+                </label>
+
+                <label>Those who bet 10:
+                    <a id="team1_10"></a> members will get:
+                    <a id="team1_10_win"></a>
+                </label>
+
+                <label>Those who bet 20:
+                    <a id="team1_20"></a> members will get:
+                    <a id="team1_20_win"></a>
+                </label>
+
+                <label>Those who bet 30:
+                    <a id="team1_30"></a> members will get:
+                    <a id="team1_30_win"></a>
+                </label>
+
+                <label>Those who bet 40:
+                    <a id="team1_40"></a> members will get:
+                    <a id="team1_40_win"></a>
+                </label>
+
+                <label>Those who bet 50:
+                    <a id="team1_50"></a> members will get:
+                    <a id="team1_50_win"></a>
+                </label>
+
+            </div>
+        </div>
+        <div class="row">
+            <div id="table_data" class="form-control">
+                <table class="table datatable-basic" id="table_result">
+                    <!-- <thead>
+                        <tr>
+                            <th>NAME</th>
+                            <th>TEAM CHOSE</th>
+                            <th>POINTS</th>
+                        </tr>
+                    </thead> -->
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
