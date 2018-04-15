@@ -12,9 +12,48 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="bootstable.js"></script>
 
     <script>
         $(document).ready(function () {
+            $("#table_result").SetEditable();
+
+            bind_table_data();
+
+            function bind_table_data() {
+                var data_query = {
+                    query1: 'SELECT * from users;'
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://localhost:3000/select_data',
+                    data: JSON.stringify(data_query),
+                    contentType: 'application/json',
+                    success: function (data_query) {
+                        for (var i = 0; i < data_query.length; i++) {
+                            var name = data_query[i].name;
+                            var team = data_query[i].team;
+                            var points = data_query[i].points;
+                            var tds = document.getElementById('table_result').getElementsByTagName('td');
+                            var ths = document.getElementById('table_result').getElementsByTagName('th');
+
+                            if ($("#select_match1").val() != "") {
+                                $(".tbody_id").empty();
+                                if (team == $("#select_match1").val() || team == $("#select_match2").val()) {
+                                    if (ths[2].innerHTML == $("#select_team").val())
+                                        $("#table_result").append('<tbody class = "tbody_id"><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + 0 + '</td><td class = "count_me" >' + points + '</td></tr></tbody>');
+                                    else if (ths[1].innerHTML == $("#select_team").val()) {
+                                        $("#table_result").append('<tbody class = "tbody_id"><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + points + '</td><td class = "count_me" >' + 0 + '</td></tr></tbody>');
+                                    }
+                                } else {
+                                    alert("Team names are different in DB. Please clear the DB and Refresh the page");
+                                    alert("the value    " + $("#select_match1").val());
+                                }
+                            }
+                        }
+                    }
+                });
+            }
             //get the distinct team points
             var temp1 = 0, temp2 = 0, profit1 = 0, profit2 = 0;
 
@@ -36,22 +75,47 @@
                         temp2 = data_query21[1][0].totalPoints2;
                         profit1 = parseFloat(temp2 / temp1).toFixed(2);
                         profit2 = parseFloat(temp1 / temp2).toFixed(2);
-                        // if($("#team1_10_win").val())
-                        // if ($('#team1_10').html() != 0)
-                        $("#team1_10_win").html(profit1 * 10);
+
+                        if ($('#team1_10').html() != 0)
+                            $("#team1_10_win").html(profit1 * 10);
+                        else
+                            $("#team1_10_win").html(0);
+
+                        if ($('#team1_20').html() != 0)
+                            $("#team1_20_win").html(profit1 * 20);
+                        else
+                            $("#team1_20_win").html(0);
+
+                        if ($('#team1_30').html() != 0)
+                            $("#team1_30_win").html(profit1 * 30);
+                        else
+                            $("#team1_30_win").html(0);
+
+                        if ($('#team1_40').html() != 0)
+                            $("#team1_40_win").html(profit1 * 40);
+                        else
+                            $("#team1_40_win").html(0);
+
+                        if ($('#team1_50').html() != 0)
+                            $("#team1_50_win").html(profit1 * 50);
+                        else
+                            $("#team1_50_win").html(0);
+
+                        $("#team2_10_win").html(profit2 * 10);
                         // if ($('#team1_20').html() != 0)
-                        $("#team1_20_win").html(profit1 * 20);
+                        $("#team2_20_win").html(profit2 * 20);
                         // if ($('#team1_30').html() != 0)
-                        $("#team1_30_win").html(profit1 * 30);
+                        $("#team2_30_win").html(profit2 * 30);
                         // if ($('#team1_40').html() != 0)
-                        $("#team1_40_win").html(profit1 * 40);
+                        $("#team2_40_win").html(profit2 * 40);
                         // if ($('#team1_50').html() != 0)
-                        $("#team1_50_win").html(profit1 * 50);
+                        $("#team2_50_win").html(profit2 * 50);
                     }
                 });
 
                 var data_query3 = {
-                    query: 'SELECT count(points) as ten FROM users where points= "10" and team = "' + $("#select_match1").val() + '";'
+                    query1: 'SELECT count(points) as ten FROM users where points= "10" and team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT count(points) as ten FROM users where points= "10" and team = "' + $("#select_match2").val() + '";'
                 };
                 $.ajax({
                     type: 'POST',
@@ -62,12 +126,14 @@
                         console.log("Data ssuccessfully posted for distinct2");
                         console.log(data_query3);
                         // $("#team1_10").html(data_query3[0].ten);
-                        $("#team1_10").html(data_query3[0].ten);
+                        $("#team1_10").html(data_query3[0][0].ten);
+                        $("#team2_10").html(data_query3[1][0].ten);
                     }
                 });
 
                 var data_query4 = {
-                    query: 'SELECT count(points) as twenty FROM users where points= "20"and team = "' + $("#select_match1").val() + '";'
+                    query1: 'SELECT count(points) as twenty FROM users where points= "20"and team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT count(points) as twenty FROM users where points= "20"and team = "' + $("#select_match2").val() + '";'
                 };
                 $.ajax({
                     type: 'POST',
@@ -77,12 +143,14 @@
                     success: function (data_query4) {
                         console.log("Data ssuccessfully posted for distinct2");
                         console.log(data_query4);
-                        $("#team1_20").html(data_query4[0].twenty);
+                        $("#team1_20").html(data_query4[0][0].twenty);
+                        $("#team2_20").html(data_query4[1][0].twenty);
                     }
                 });
 
                 var data_query5 = {
-                    query: 'SELECT count(points) as thirty FROM users where points= "30"and team = "' + $("#select_match1").val() + '";'
+                    query1: 'SELECT count(points) as thirty FROM users where points= "30"and team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT count(points) as twenty FROM users where points= "30"and team = "' + $("#select_match2").val() + '";'
                 };
                 $.ajax({
                     type: 'POST',
@@ -92,12 +160,14 @@
                     success: function (data_query5) {
                         console.log("Data ssuccessfully posted for distinct2");
                         console.log(data_query5);
-                        $("#team1_30").html(data_query5[0].thirty);
+                        $("#team1_30").html(data_query5[0][0].thirty);
+                        $("#team2_30").html(data_query5[1][0].thirty);
                     }
                 });
 
                 var data_query6 = {
-                    query: 'SELECT count(points) as forty FROM users where points= "40"and team = "' + $("#select_match1").val() + '";'
+                    query1: 'SELECT count(points) as forty FROM users where points= "40"and team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT count(points) as twenty FROM users where points= "40"and team = "' + $("#select_match2").val() + '";'
                 };
                 $.ajax({
                     type: 'POST',
@@ -107,12 +177,14 @@
                     success: function (data_query6) {
                         console.log("Data ssuccessfully posted for distinct2");
                         console.log(data_query6);
-                        $("#team1_40").html(data_query6[0].forty);
+                        $("#team1_40").html(data_query6[0][0].forty);
+                        $("#team2_40").html(data_query6[1][0].forty);
                     }
                 });
 
                 var data_query7 = {
-                    query: 'SELECT count(points) as fifty FROM users where points= "50"and team = "' + $("#select_match1").val() + '";'
+                    query1: 'SELECT count(points) as fifty FROM users where points= "50"and team = "' + $("#select_match1").val() + '";',
+                    query2: 'SELECT count(points) as fifty FROM users where points= "50"and team = "' + $("#select_match2").val() + '";'
                 };
                 $.ajax({
                     type: 'POST',
@@ -122,12 +194,11 @@
                     success: function (data_query7) {
                         console.log("Data ssuccessfully posted for distinct2");
                         console.log(data_query7);
-                        $("#team1_50").html(data_query7[0].fifty);
+                        $("#team1_50").html(data_query7[0][0].fifty);
+                        $("#team2_50").html(data_query7[1][0].fifty);
                     }
                 });
-            }
 
-            function reload_table() {
 
                 var tds = document.getElementById('table_result').getElementsByTagName('td');
                 var ths = document.getElementById('table_result').getElementsByTagName('th');
@@ -150,6 +221,7 @@
                 // console.log(tds[0].innerHTML + "  " + tds[1].innerHTML + "  " + tds[3].innerHTML);
                 $("#total_points").html(sum);
                 $("#team1_win").html($("#select_match1").val());
+                $("#team2_win").html($("#select_match2").val());
                 // $("#total_members_t1").html(sum_team1);
                 // $("#total_members_t2").html(sum_team2);
 
@@ -231,8 +303,8 @@
                     //datatype: 'json',
                     contentType: 'application/json',
                     success: function (data_query) {
-                        console.log(data_query + "data_query");
                         alert("All Records Has Been Deleted!!");
+                        bind_table_data();
                     }
                 });
             });
@@ -242,15 +314,15 @@
                 var team_chose = $("#select_team").val();
                 var points = $("#select_points").val();
 
-                var tds = document.getElementById('table_result').getElementsByTagName('td');
-                var ths = document.getElementById('table_result').getElementsByTagName('th');
+                // var tds = document.getElementById('table_result').getElementsByTagName('td');
+                // var ths = document.getElementById('table_result').getElementsByTagName('th');
                 var sum = 0, sum_team1 = 0, sum_team2 = 0, sum_team1_points = 0, sum_team2_points = 0;
                 //count total no of points people invested
-                if (ths[1].innerHTML == $("#select_team").val())
-                    $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + 0 + '</td><td class = "count_me" >' + points + '</td></tr></tbody>');
-                else if (ths[2].innerHTML == $("#select_team").val()) {
-                    $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + points + '</td><td class = "count_me" >' + 0 + '</td></tr></tbody>');
-                }
+                // if (ths[2].innerHTML == $("#select_team").val())
+                //     $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + 0 + '</td><td class = "count_me" >' + points + '</td></tr></tbody>');
+                // else if (ths[1].innerHTML == $("#select_team").val()) {
+                //     $("#table_result").append('<tbody><tr><td class = "count_member">' + name + '</td><td class = "count_team">' + points + '</td><td class = "count_me" >' + 0 + '</td></tr></tbody>');
+                // }
                 var data = {
                     name: name,
                     team: team_chose,
@@ -264,27 +336,17 @@
                     //datatype: 'json',
                     contentType: 'application/json',
                     success: function (data) {
-                        console.log("Data successfully posted");
+                        console.log("Data successfully posted     " + data);
                     }
                 });
                 distinct_team();
-                reload_table();
+                bind_table_data();
             });
 
             $("#export").click(function (e) {
-
                 window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#table_data').html()));
                 e.preventDefault();
-                // window.open('data:application/vnd.ms-excel,' + $('#table_result').html());
-                // e.preventDefault();
             });
-
-            // function saveText(text, filename) {
-            //     var a = document.createElement('a');
-            //     a.setAttribute('href', 'data:text/plain;charset=utf-u,' + encodeURIComponent(text));
-            //     a.setAttribute('download', filename);
-            //     a.click()
-            // }
             var d = new Date();
             var day = d.getDate();
             var month = d.getMonth();
@@ -404,10 +466,43 @@
                 </label>
 
             </div>
+            <div class="col-sm-4">
+                <label>If this team wins:
+                    <a id="team2_win"></a>
+                    <a id="team2_win_profit"></a>
+                </label>
+
+                <label>Those who bet 10:
+                    <a id="team2_10"></a> members will get:
+                    <a id="team2_10_win"></a>
+                </label>
+
+                <label>Those who bet 20:
+                    <a id="team2_20"></a> members will get:
+                    <a id="team2_20_win"></a>
+                </label>
+
+                <label>Those who bet 30:
+                    <a id="team2_30"></a> members will get:
+                    <a id="team2_30_win"></a>
+                </label>
+
+                <label>Those who bet 40:
+                    <a id="team2_40"></a> members will get:
+                    <a id="team2_40_win"></a>
+                </label>
+
+                <label>Those who bet 50:
+                    <a id="team2_50"></a> members will get:
+                    <a id="team2_50_win"></a>
+                </label>
+
+            </div>
+
         </div>
         <div class="row">
             <div id="table_data" class="form-control">
-                <table class="table datatable-basic" id="table_result">
+                <table class="table table-bordered" id="table_result">
                     <!-- <thead>
                         <tr>
                             <th>NAME</th>
